@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Free Mortgage Calculator: Monthly Payment and Total Interest</title>
+  <meta name="description" content="Free mortgage calculator. Estimate your monthly payment, total interest, and loan balance over time. Enter home price, down payment, rate, and term." />
+  <link rel="canonical" href="https://example.com/" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Free Mortgage Calculator",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "Any",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "description": "Estimate monthly mortgage payments, total interest, and yearly loan balance."
+  }
+  </script>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 20px; color: #1c1c19; line-height: 1.5; }
+    h1 { font-size: 1.8rem; margin-bottom: 4px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; margin-top: 20px; }
+    label { font-weight: 600; font-size: 0.95rem; }
+    input { width: 100%; padding: 8px; margin-top: 4px; font: inherit; box-sizing: border-box; }
+    button { margin-top: 18px; padding: 10px 18px; font: inherit; cursor: pointer; }
+    .results { margin-top: 24px; padding: 16px; background: #f4f4f0; border-radius: 6px; }
+    .big { font-size: 1.6rem; font-weight: 700; }
+    table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 0.9rem; }
+    th, td { text-align: right; padding: 6px; border-bottom: 1px solid #ddd; }
+    th:first-child, td:first-child { text-align: left; }
+    .error { color: #b00020; margin-top: 12px; }
+    footer { margin-top: 40px; font-size: 0.85rem; color: #666; }
+  </style>
+</head>
+<body>
+  <h1>Mortgage Calculator</h1>
+  <p>Estimate your monthly payment and how much interest you'll pay over the life of the loan.</p>
+
+  <div class="grid">
+    <label>Home price ($)<input id="price" type="number" min="0" value="400000" /></label>
+    <label>Down payment ($)<input id="down" type="number" min="0" value="80000" /></label>
+    <label>Interest rate (% per year)<input id="rate" type="number" min="0" step="0.01" value="6.5" /></label>
+    <label>Loan term (years)<input id="term" type="number" min="1" max="50" value="30" /></label>
+    <label>Property tax per year ($)<input id="tax" type="number" min="0" value="4800" /></label>
+    <label>Home insurance per year ($)<input id="ins" type="number" min="0" value="1500" /></label>
+  </div>
+
+  <button id="calc">Calculate</button>
+  <div id="error" class="error" hidden></div>
+
+  <div id="results" class="results" hidden>
+    <div>Estimated monthly payment</div>
+    <div class="big" id="monthly"></div>
+    <div>Principal and interest: <span id="pi"></span> &middot; Tax and insurance: <span id="escrow"></span></div>
+    <p>Total interest over the loan: <strong id="interest"></strong><br />
+    Loan amount: <strong id="loan"></strong></p>
+
+    <table>
+      <thead><tr><th>Year</th><th>Interest paid</th><th>Principal paid</th><th>Remaining balance</th></tr></thead>
+      <tbody id="schedule"></tbody>
+    </table>
+  </div>
+
+  <footer>This is an estimate for planning only. Actual lender quotes vary and do not include all fees.</footer>
+
+  <script>
+    const fmt = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
+    const val = id => parseFloat(document.getElementById(id).value) || 0;
+
+    document.getElementById("calc").addEventListener("click", () => {
+      const price = val("price"), down = val("down"), rate = val("rate");
+      const years = val("term"), tax = val("tax"), ins = val("ins");
+      const err = document.getElementById("error");
+      const results = document.getElementById("results");
+
+      if (down >= price || years <= 0 || price <= 0) {
+        err.textContent = "Check your inputs: down payment must be less than the price, and term must be greater than 0.";
+        err.hidden = false; results.hidden = true; return;
+      }
+      err.hidden = true;
+
+      const loan = price - down;
+      const n = Math.round(years * 12);
+      const r = rate / 100 / 12;
+      const pi = r === 0 ? loan / n : loan * r / (1 - Math.pow(1 + r, -n));
+      const escrow = (tax + ins) / 12;
+
+      let balance = loan, rows = "", yearInterest = 0, yearPrincipal = 0, totalInterest = 0;
+      for (let m = 1; m <= n; m++) {
+        const interest = balance * r;
+        const principal = pi - interest;
+        balance = Math.max(0, balance - principal);
+        yearInterest += interest; yearPrincipal += principal; totalInterest += interest;
+        if (m % 12 === 0 || m === n) {
+          rows += `<tr><td>${Math.ceil(m / 12)}</td><td>${fmt.format(yearInterest)}</td><td>${fmt.format(yearPrincipal)}</td><td>${fmt.format(balance)}</td></tr>`;
+          yearInterest = 0; yearPrincipal = 0;
+        }
+      }
+
+      document.getElementById("monthly").textContent = fmt.format(pi + escrow);
+      document.getElementById("pi").textContent = fmt.format(pi);
+      document.getElementById("escrow").textContent = fmt.format(escrow);
+      document.getElementById("interest").textContent = fmt.format(totalInterest);
+      document.getElementById("loan").textContent = fmt.format(loan);
+      document.getElementById("schedule").innerHTML = rows;
+      results.hidden = false;
+    });
+
+    document.getElementById("calc").click();
+  </script>
+</body>
+</html>
