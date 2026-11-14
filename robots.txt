@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://nicksteiner3.github.io/mortgage-calculator/sitemap.xml
