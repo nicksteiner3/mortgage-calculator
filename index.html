@@ -18,24 +18,35 @@
   }
   </script>
   <style>
-    body { font-family: system-ui, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 20px; color: #1c1c19; line-height: 1.5; }
-    h1 { font-size: 1.8rem; margin-bottom: 4px; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; margin-top: 20px; }
-    label { font-weight: 600; font-size: 0.95rem; }
-    input { width: 100%; padding: 8px; margin-top: 4px; font: inherit; box-sizing: border-box; }
-    button { margin-top: 18px; padding: 10px 18px; font: inherit; cursor: pointer; }
-    .results { margin-top: 24px; padding: 16px; background: #f4f4f0; border-radius: 6px; }
-    .big { font-size: 1.6rem; font-weight: 700; }
-    table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 0.9rem; }
-    th, td { text-align: right; padding: 6px; border-bottom: 1px solid #ddd; }
-    th:first-child, td:first-child { text-align: left; }
+    :root { --brand: #1a6b4f; --ink: #1f2933; --muted: #5f6b76; --bg: #f5f7f6; --card: #ffffff; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--ink); background: var(--bg); line-height: 1.6; }
+    header { background: var(--brand); color: #fff; padding: 16px 24px; font-weight: 600; }
+    main { max-width: 760px; margin: 32px auto; padding: 0 20px; }
+    .card { background: var(--card); border-radius: 12px; padding: 28px; box-shadow: 0 1px 3px rgba(0,0,0,.08); margin-bottom: 24px; }
+    h1 { font-size: 2rem; margin: 0 0 8px; }
+    .lede { color: var(--muted); font-size: 1.05rem; margin: 0 0 20px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    label { font-weight: 600; font-size: .9rem; color: var(--muted); }
+    input { width: 100%; padding: 10px; margin-top: 6px; font: inherit; color: var(--ink); border: 1px solid #cfd8d4; border-radius: 8px; }
+    button { margin-top: 20px; background: var(--brand); color: #fff; border: 0; border-radius: 8px; padding: 12px 22px; font: inherit; font-weight: 600; cursor: pointer; }
     .error { color: #b00020; margin-top: 12px; }
-    footer { margin-top: 40px; font-size: 0.85rem; color: #666; }
+    .results { background: #eef6f2; }
+    .big { font-size: 2.2rem; font-weight: 700; color: var(--brand); }
+    table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: .95rem; font-variant-numeric: tabular-nums; }
+    th, td { text-align: right; padding: 10px 8px; border-bottom: 1px solid #dfe6e2; }
+    th:first-child, td:first-child { text-align: left; }
+    th { font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+    footer { max-width: 760px; margin: 0 auto 40px; padding: 0 20px; font-size: .85rem; color: var(--muted); }
+    @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
+  <header>Mortgage Calculator</header>
+  <main>
+  <div class="card">
   <h1>Mortgage Calculator</h1>
-  <p>Estimate your monthly payment and how much interest you'll pay over the life of the loan.</p>
+  <p class="lede">Estimate your monthly payment and how much interest you'll pay over the life of the loan.</p>
 
   <div class="grid">
     <label>Home price ($)<input id="price" type="number" min="0" value="400000" /></label>
@@ -48,8 +59,9 @@
 
   <button id="calc">Calculate</button>
   <div id="error" class="error" hidden></div>
+  </div>
 
-  <div id="results" class="results" hidden>
+  <div id="results" class="card results" hidden>
     <div>Estimated monthly payment</div>
     <div class="big" id="monthly"></div>
     <div>Principal and interest: <span id="pi"></span> &middot; Tax and insurance: <span id="escrow"></span></div>
@@ -61,6 +73,7 @@
       <tbody id="schedule"></tbody>
     </table>
   </div>
+  </main>
 
   <footer>This is an estimate for planning only. Actual lender quotes vary and do not include all fees.</footer>
 
